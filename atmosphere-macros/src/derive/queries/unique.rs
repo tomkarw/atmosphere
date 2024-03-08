@@ -36,11 +36,12 @@ pub fn queries(table: &Table) -> TokenStream {
         stream.extend(quote!(
             #[automatically_derived]
             impl #ident {
-                pub async fn #find_by_col<'e, E>(
-                    value: &#ty,
+                pub async fn #find_by_col<'e, V: ?Sized, E>(
+                    value: &V,
                     executor: E
                 ) -> ::atmosphere::Result<Option<#ident>>
                 where
+                    V: Borrow<#ty>,
                     E: ::atmosphere::sqlx::Executor<'e, Database = ::atmosphere::Driver>,
                     for<'q> <::atmosphere::Driver as ::atmosphere::sqlx::database::HasArguments<'q>>::Arguments:
                         ::atmosphere::sqlx::IntoArguments<'q, ::atmosphere::Driver> + Send
@@ -64,11 +65,12 @@ pub fn queries(table: &Table) -> TokenStream {
                         .map_err(Error::Query)
                 }
 
-                pub async fn #delete_by_col<'e, E>(
-                    value: &#ty,
+                pub async fn #delete_by_col<'e, V: ?Sized, E>(
+                    value: &V,
                     executor: E,
                 ) -> ::atmosphere::Result<<::atmosphere::Driver as ::atmosphere::sqlx::Database>::QueryResult>
                 where
+                    V: Borrow<#ty>,
                     E: ::atmosphere::sqlx::Executor<'e, Database = ::atmosphere::Driver>,
                     for<'q> <::atmosphere::Driver as ::atmosphere::sqlx::database::HasArguments<'q>>::Arguments:
                         ::atmosphere::sqlx::IntoArguments<'q, ::atmosphere::Driver> + Send
