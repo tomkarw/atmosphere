@@ -47,5 +47,11 @@ async fn main() -> atmosphere::Result<()> {
     .save(&pool)
     .await?;
 
+    assert!(
+        User::find_by_email(&pool, "some@email.com")
+            .await?
+            .is_some()
+    );
+
     Ok(())
 }
